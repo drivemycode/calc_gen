@@ -225,7 +225,7 @@ def random_expression(difficulty: str) -> str:
 
 
 if __name__ == "__main__":
-    x = random_expression("medium")
+    x = random_expression("easy")
     with open("result.txt", "w") as f:
         f.write(x + "\n")
         f.write(x.replace("\\left", "").replace("\\right", "").replace("^{}", ""))
