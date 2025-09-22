@@ -1,8 +1,11 @@
 from django.shortcuts import render
+
+from . import script
 from .models import TodoItem
 
 # Create your views here.
 def home(request):
+    script.calc_gen()
     return render(request, "home.html")
 
 def todos(request):

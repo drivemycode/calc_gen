@@ -14,8 +14,8 @@ def latex_to_png(latex_str: str) -> str:
     fig = plt.figure()
     plt.axis("off")
     plt.text(0.5, 0.5, f"${latex_str}$", size=50, ha="center", va="center")
-    pdf_path = "./result.pdf"
-    png_path = "./result.png"
+    pdf_path = "static/result.pdf"
+    png_path = "static/result.png"
     plt.savefig(pdf_path, format="pdf", bbox_inches="tight", pad_inches=0.4)
     plt.close(fig)
     images = convert_from_path(pdf_path)
@@ -223,10 +223,12 @@ def random_expression(difficulty: str) -> str:
             x_term = mutator(x_term)
     return x_term
 
-
-if __name__ == "__main__":
+def calc_gen():
     x = random_expression("easy")
-    with open("result.txt", "w") as f:
+    with open("static/result.txt", "w") as f:
         f.write(x + "\n")
         f.write(x.replace("\\left", "").replace("\\right", "").replace("^{}", ""))
     latex_to_png(x)
+
+if __name__ == "__main__":
+    calc_gen()
