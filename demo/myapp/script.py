@@ -4,6 +4,18 @@ import regex
 import matplotlib.pyplot as plt
 from pdf2image import convert_from_path
 
+INT_RANGE = 42 # range of randomly generated integers (note: should be >1)
+FRACTION_COEFF_ODDS = 0.9 # odds of coefficient being a fraction
+FRACTION_POWER_ODDS = 0.66 # odds of power being a fraction
+FRACTION_POLY_ODDS = 0.4 # odds of randomly generated x term including fractions
+POWER_ISANNOYING_ODDS = 0.55 # odds of power being unpleasant (not single integers)
+POWER_ISNEGATIVE_ODDS = 0.73 # odds of power being negative
+INT_OPERATION_ODDS = 0.68 # odds of operation involving integers only
+CONSTANT_OPERATION_ODDS = 0.55 # odds of operation involving constants (not necessarily integers, but fractions)
+NICEX_OPERATION_ODDS = 0.37 # odds of x being of the form ax^b where a, b are integers
+NICE_EXPO_ODDS = 0.7 # odds of exponential power being integer only
+NICE_LOG_ODDS = 0.75 # odds of logarithm being the natural log
+FRACTION_EXPR_ODDS = 0.8 # odds of generated expression being put through a fraction if difficulty isn't medium or hard
 
 def latex_to_png(latex_str: str) -> str:
     """
@@ -29,8 +41,8 @@ def frac_helper(mode: str) -> str:
     :mode: str, specifies \\frac or \dfrac. Can be either "dfrac" or "frac"
     :return: LaTeX string, which represents the (simplified) fraction
     """
-    num = random.randint(-42, 42)
-    denom = random.randint(1, 42)
+    num = random.randint(-INT_RANGE, INT_RANGE)
+    denom = random.randint(1, INT_RANGE)
     if num == denom:
         num += random.randint(1, denom - 1)
     gcd = math.gcd(num, denom)
@@ -59,19 +71,19 @@ def random_x(coefficient_mode: str) -> str:
     :return: Any exponent, multiple version of x in LaTeX.
     """
     p = random.random()
-    if p < 0.9:
-        lat_coefficient = str(random.randint(-42, 42))
-        lat_power = str(random.randint(-10, 10))
-        if p >= 0.5:
+    if p < FRACTION_POLY_ODDS:
+        lat_coefficient = str(random.randint(-INT_RANGE, INT_RANGE))
+        lat_power = str(random.randint(-INT_RANGE, INT_RANGE))
+        if p >= FRACTION_COEFF_ODDS:
             if coefficient_mode == "dfrac":
                 lat_coefficient = frac_helper("dfrac")
             if coefficient_mode == "frac":
                 lat_coefficient = frac_helper("frac")
-            if p < 0.66:
-                lat_power = frac_helper("frac")
+        if p < FRACTION_POWER_ODDS:
+            lat_power = frac_helper("frac")
     else:
-        lat_coefficient = str(random.randint(-10, 10))
-        lat_power = str(random.randint(-6, 6))
+        lat_coefficient = str(random.randint(-INT_RANGE, INT_RANGE))
+        lat_power = str(random.randint(-INT_RANGE, INT_RANGE))
     if lat_coefficient == "1":
         lat_coefficient = ""
     if lat_coefficient == "-1":
@@ -100,18 +112,20 @@ def random_power(expression: str, brackets=True) -> str:
     if brackets:
         s1 = "{\\left("
         s2 = "\\right)}^{"
-    if p1 > 0.7:
-        if p2 > 0.66:
+    if p1 > POWER_ISANNOYING_ODDS:
+        if p2 > FRACTION_POWER_ODDS:
             return s1 + expression + s2 + frac_helper("frac") + "}"
-        elif p2 < 0.78:
-            return s1 + expression + s2 + str(random.randint(10, 99)) + "}"
+        elif p2 > POWER_ISNEGATIVE_ODDS:
+            return s1 + expression + s2 + str(random.randint(-10 * INT_RANGE, - (INT_RANGE // 2))) + "}"
         else:
-            return s1 + expression + s2 + str(random.randint(-101, -11)) + "}"
+            return s1 + expression + s2 + str(random.randint(INT_RANGE, 99)) + "}"
+
     else:
-        if p2 >= 0.5:
-            return s1 + expression + s2 + str(random.randint(2, 9)) + "}"
+        if p2 >= POWER_ISNEGATIVE_ODDS:
+            return s1 + expression + s2 + str(random.randint(- INT_RANGE, - (INT_RANGE// 2))) + "}"
         else:
-            return s1 + expression + s2 + str(random.randint(-9, -1)) + "}"
+            return s1 + expression + s2 + str(random.randint(INT_RANGE // 2, INT_RANGE)) + "}"
+
 
 
 def random_trig(expression: str, raised=True) -> str:
@@ -122,7 +136,9 @@ def random_trig(expression: str, raised=True) -> str:
     :return: Expression, that is wrapped in the trig
     """
     trigs = ["\\sin", "\\cos", "\\tan", "\\csc", "\\sec", "\\cot", "\\arcsin",
-             "\\arccos", "\\arctan", "\\text{arcsec}", "\\text{arccsc}", "\\text{arccot}"]
+             "\\arccos", "\\arctan",
+             # "\\text{arcsec}", "\\text{arccsc}", "\\text{arccot}"
+             ]
     trig = random.choice(trigs)
     if raised:
         return random_power(trig, False) + f"\\left({expression}\\right)"
@@ -140,9 +156,9 @@ def random_operation(expression: str) -> str:
     p2 = random.random()
     operations = ["+", "-"]
     op = random.choice(operations)
-    if p1 > 0.55:
-        if p2 > 0.65:
-            return expression + op + str(random.randint(1, 99))
+    if p1 > CONSTANT_OPERATION_ODDS:
+        if p2 > INT_OPERATION_ODDS:
+            return expression + op + str(random.randint(1, INT_RANGE))
         else:
             frac = frac_helper("frac")
             if op == "+" and frac[0] == "-":
@@ -155,9 +171,9 @@ def random_operation(expression: str) -> str:
     else:
         signs = ["", "-"]
         sign = random.choice(signs)
-        if p2 > 0.37:
-            return (expression + op + str(random.randint(1, 85)) +
-                    "x^{" + sign + str(random.randint(1, 85)) + "}")
+        if p2 > NICEX_OPERATION_ODDS:
+            return (expression + op + str(random.randint(1, INT_RANGE)) +
+                    "x^{" + sign + str(random.randint(1, INT_RANGE)) + "}").replace("1x", "")
         else:
             x_term = random_x("frac")
             if op == "+" and x_term[0] == "-":
@@ -176,10 +192,10 @@ def random_exponential(expression: str) -> str:
     :return:
     """
     p = random.random()
-    if p > 0.8:
-        return f"{random.uniform(1.1, 87):.2f}" + "^{" + expression + "}"
+    if p > NICE_EXPO_ODDS:
+        return str(random.randint(2, INT_RANGE)) + "^{" + expression + "}"
     else:
-        return str(random.randint(2, 98)) + "^{" + expression + "}"
+        return f"{random.uniform(1.1, INT_RANGE * 2):.2f}" + "^{" + expression + "}"
 
 
 def random_logarithm(expression: str) -> str:
@@ -189,10 +205,12 @@ def random_logarithm(expression: str) -> str:
     :return:
     """
     p = random.random()
-    if p > 0.64:
-        return "\\log_{" + str(random.randint(2, 87)) + "}{\\left(" + expression + "\\right)}"
+    pos_expression = expression[1:] if expression[0] == '-' else expression
+
+    if p > NICE_LOG_ODDS:
+        return "\\ln" + " {\\left(" + pos_expression + "\\right)}"
     else:
-        return "\\ln" + " {\\left(" + expression + "\\right)}"
+        return "\\log_{" + str(random.randint(2, INT_RANGE * 2)) + "}{\\left(" + pos_expression + "\\right)}"
 
 
 def random_expression(difficulty: str) -> str:
@@ -205,7 +223,8 @@ def random_expression(difficulty: str) -> str:
                     "easy": random.randint(1, 3),
                     "medium": random.randint(4, 6),
                     "hard": random.randint(8, 12),
-                    "ruSure": 20
+                    "ruSure": 20,
+                    "dev": 100
                     }
     n = difficulties[difficulty]
     x_term = random_x("frac")
@@ -214,7 +233,7 @@ def random_expression(difficulty: str) -> str:
         mutator = random.choice(mutators)
         if mutator is random_trig and (difficulty == "easy" or difficulty == 'baby'):
             x_term = mutator(x_term, False)
-        elif p > 0.85:
+        elif p > 0.80:
             if difficulty == "easy" or difficulty == 'baby':
                 x_term = mutator(x_term)
             else:
@@ -223,12 +242,30 @@ def random_expression(difficulty: str) -> str:
             x_term = mutator(x_term)
     return x_term
 
-def calc_gen():
-    x = random_expression("easy")
+def calc_gen(difficulty: str) -> None:
+    """
+    Original "main" function. It creates an image and pdf
+    of the generated latex expression.
+
+    :param difficulty:
+    :return:
+    """
+    x = random_expression(difficulty)
     with open("static/result.txt", "w") as f:
         f.write(x + "\n")
         f.write(x.replace("\\left", "").replace("\\right", "").replace("^{}", ""))
     latex_to_png(x)
 
+def calc_gen_text(difficulty: str) -> str:
+    """
+    Modified calc_gen to return the latex string, albeit slightly
+    reformatted.
+
+    :param difficulty:
+    :return:
+    """
+    x = random_expression(difficulty)
+    return x.replace("^{}", "")
+
 if __name__ == "__main__":
-    calc_gen()
+    calc_gen("dev")

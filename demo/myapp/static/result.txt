@@ -1,2 +1,2 @@
-\ln {\left(37x^{-3}\right)}
-\ln {(37x^{-3})}
+\text{arccot}\left(-\frac{13}{29}x^{\frac{15}{17}}\right)+\frac{17}{27}
+\text{arccot}(-\frac{13}{29}x^{\frac{15}{17}})+\frac{17}{27}

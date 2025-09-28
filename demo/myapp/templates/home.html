@@ -1,8 +1,274 @@
-{% extends "base.html" %} {% block title %} Home Page {% endblock %}
+{% extends "base.html" %}
+{% block title %} Home Page {% endblock %}
+
 {% block content %}
-<!--{% load static %}-->
-<!--<img src="{% static 'result.png' %}">-->
-<h2>
-    $$ \ln{\left(37x^{-3}\right)} $$
-</h2>
-{% endblock %}
+<div class="container">
+    <div class="math-container">
+        <!-- Fixed height container for the expression -->
+        <div class="expression-wrapper">
+            <h2 id="expression" class="math-expression">
+                $$ {{ expression|default:"x + 2" }} $$
+            </h2>
+        </div>
+
+        <!-- Difficulty selection header -->
+        <div class="difficulty-header text-center mb-4">
+            <h3 class="text-muted">Welcome to differentiation practice!</h3>
+            <p class="text-muted">Choose a difficulty, generate an expression</p>
+        </div>
+
+        <!-- Form that stays in fixed position -->
+        <div class="form-wrapper">
+            <form action="{% url 'run-script' %}" method="post" class="difficulty-form">
+                {% csrf_token %}
+                <div class="button-grid">
+                    <button name="action" type="submit" class="btn btn-success difficulty-btn" value="baby">
+                        <i class="fas fa-baby"></i> Baby Function
+                        <small class="d-block">Basic operations</small>
+                    </button>
+                    <button name="action" type="submit" class="btn btn-info difficulty-btn" value="easy">
+                        <i class="fas fa-walking"></i> Easy Function
+                        <small class="d-block">Simple expressions</small>
+                    </button>
+                    <button name="action" type="submit" class="btn btn-warning difficulty-btn" value="medium">
+                        <i class="fas fa-running"></i> Medium Function
+                        <small class="d-block">Moderate complexity</small>
+                    </button>
+                    <button name="action" type="submit" class="btn btn-orange difficulty-btn" value="hard">
+                        <i class="fas fa-fire"></i> Hard Function
+                        <small class="d-block">Advanced challenges</small>
+                    </button>
+                    <button name="action" type="submit" class="btn btn-danger difficulty-btn" value="ruSure">
+                        <i class="fas fa-bolt"></i> Impossible Function
+                        <small class="d-block">Expert level</small>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .expression-wrapper {
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        overflow: hidden; /* Prevent actual overflow */
+        position: relative;
+    }
+
+    .math-expression {
+        text-align: center;
+        margin: 0;
+        color: #2c3e50;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%; /* Ensure it doesn't overflow container */
+        transition: font-size 0.3s ease; /* Smooth scaling */
+    }
+    .math-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        padding: 20px;
+    }
+
+    .expression-wrapper {
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .math-expression {
+        text-align: center;
+        margin: 0;
+        font-size: 1.8rem;
+        color: #2c3e50;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .difficulty-header h3 {
+        font-weight: 300;
+        margin-bottom: 5px;
+    }
+
+    .form-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .difficulty-btn {
+        padding: 20px 15px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    .difficulty-btn i {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    .difficulty-btn small {
+        opacity: 0.9;
+        font-weight: 400;
+        margin-top: 5px;
+    }
+
+    .difficulty-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .difficulty-btn:active {
+        transform: translateY(-1px);
+    }
+
+    /* Custom orange button */
+    .btn-orange {
+        background: linear-gradient(45deg, #ff6b35, #ff8e35);
+        color: white;
+    }
+
+    .btn-orange:hover {
+        background: linear-gradient(45deg, #ff5a20, #ff7b20);
+        color: white;
+    }
+
+    /* Button colors with gradients */
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+    }
+
+    .btn-info {
+        background: linear-gradient(45deg, #17a2b8, #6f42c1);
+    }
+
+    .btn-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #dc3545, #e83e8c);
+    }
+
+    /* Ensure MathJax renders properly */
+    .MathJax {
+        outline: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .expression-wrapper {
+            min-height: 120px;
+            padding: 15px;
+        }
+
+        .math-expression {
+            font-size: 1.4rem;
+        }
+
+        .button-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .difficulty-btn {
+            min-height: 80px;
+            padding: 15px 10px;
+            font-size: 1rem;
+        }
+
+        .difficulty-btn i {
+            font-size: 1.3rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .math-container {
+            padding: 10px;
+        }
+
+        .difficulty-header h3 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+
+<script>
+    // Re-render MathJax when page loads or expression changes
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+            MathJax.typeset();
+        }
+    });
+        function scaleMathExpression() {
+        const expressionElement = document.getElementById('expression');
+        const container = expressionElement.closest('.expression-wrapper');
+        const mathJaxElement = expressionElement.querySelector('.MathJax') || expressionElement;
+
+        let fontSize = 1.8; // Starting font size in rem
+
+        // Reset to default size first
+        expressionElement.style.fontSize = fontSize + 'rem';
+
+        // Check if content overflows
+        while (mathJaxElement.scrollWidth > container.clientWidth - 40 && fontSize > 0.8) {
+            fontSize -= 0.1;
+            expressionElement.style.fontSize = fontSize + 'rem';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initial scale check
+        setTimeout(scaleMathExpression, 100); // Small delay for MathJax to render
+
+        // Re-scale when window resizes
+        window.addEventListener('resize', scaleMathExpression);
+
+        // Re-scale when MathJax finishes rendering
+        if (typeof MathJax !== 'undefined') {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                setTimeout(scaleMathExpression, 50);
+            });
+        }
+    });
+</script>
+{% endblock content %}
