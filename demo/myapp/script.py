@@ -213,20 +213,31 @@ def random_logarithm(expression: str) -> str:
         return "\\log_{" + str(random.randint(2, INT_RANGE * 2)) + "}{\\left(" + pos_expression + "\\right)}"
 
 
+def random_product(expression: str) -> str:
+    """
+    Multiply expression by a random expression
+    :param expression:
+    :return:
+    """
+    expressions = [random_logarithm, random_exponential, random_operation, random_trig, random_power]
+    new_expression = random.choice(expressions)
+    return expression + new_expression(random_x("frac"))
+
+
 def random_expression(difficulty: str) -> str:
     """
     :param difficulty: str that indicates the difficulty level, either 'baby', 'easy', 'medium', 'hard', 'ruSure'
     :return: the expression, in LaTeX.
     """
-    mutators = [random_logarithm, random_exponential, random_operation, random_trig, random_power]
     difficulties = {"baby": 1,
                     "easy": random.randint(1, 3),
                     "medium": random.randint(4, 6),
                     "hard": random.randint(8, 12),
                     "ruSure": 20,
-                    "dev": 100
+                    "dev": 25
                     }
     n = difficulties[difficulty]
+    mutators = [random_logarithm, random_exponential, random_operation, random_trig, random_power, random_product]
     x_term = random_x("frac")
     for _ in range(n):
         p = random.random()
@@ -268,4 +279,4 @@ def calc_gen_text(difficulty: str) -> str:
     return x.replace("^{}", "")
 
 if __name__ == "__main__":
-    calc_gen("dev")
+    calc_gen("medium")

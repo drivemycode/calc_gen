@@ -1,2 +1,2 @@
-\text{arccot}\left(-\frac{13}{29}x^{\frac{15}{17}}\right)+\frac{17}{27}
-\text{arccot}(-\frac{13}{29}x^{\frac{15}{17}})+\frac{17}{27}
+\log_{39}{\left(\ln {\left({\left({\left(-3x^{9}\right)}^{84}\right)}^{-26}12x^{7}+\frac{6}{5}57.75^{-42x^{-\frac{5}{13}}}\right)}\right)}
+\log_{39}{(\ln {({({(-3x^{9})}^{84})}^{-26}12x^{7}+\frac{6}{5}57.75^{-42x^{-\frac{5}{13}}})})}
