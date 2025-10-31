@@ -34,7 +34,10 @@ async def solve_problem(problem: str) -> str:
                 "content": "You are a master of differentiation, your task is to differentiate a user-provided "
                            "mathematical expression, which is typically given in LaTeX form. You do not to provide "
                            "any intermediate steps, working out, just concern yourself with the final answer. The final "
-                           "answer should be in the form of 'The derivative is: <answer>. "
+                           "answer should be in the form of <answer>. <answer> should be in MathJax form, "
+                           "such that <answer> can be rendered appropriately. Refrain, as much as possible from adding "
+                           "further clarification in textual word such as stating 'The answer is..', 'The derivative is..', "
+                           "'Here\'s the answer' etc."
             },
             {
                 "role": "user",
