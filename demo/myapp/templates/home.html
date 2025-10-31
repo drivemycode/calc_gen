@@ -42,8 +42,15 @@
                         <i class="fas fa-bolt"></i> Impossible Function
                         <small class="d-block">Expert level</small>
                     </button>
+                    <button name="action" type="submit" class="btn btn-solve difficulty-btn" value="">
+                        <i class="fas fa-bolt"></i> Solution
+                        <small class="d-block">AI generated answer</small>
+                    </button>
                 </div>
             </form>
+        </div>
+        <div>
+            {{ solution|default:"I\'m here to help! :)" }}
         </div>
     </div>
 </div>
@@ -187,6 +194,10 @@
 
     .btn-danger {
         background: linear-gradient(45deg, #dc3545, #e83e8c);
+    }
+
+    .btn-solve {
+        linear-gradient(45deg, #dd2476, #ff512f);
     }
 
     /* Ensure MathJax renders properly */

@@ -1,7 +1,11 @@
 import random
 import math
 import regex
+import asyncio
+import os
 import matplotlib.pyplot as plt
+from mistralai import Mistral
+from mistralai.models import UserMessage
 from pdf2image import convert_from_path
 
 INT_RANGE = 42 # range of randomly generated integers (note: should be >1)
@@ -16,6 +20,31 @@ NICEX_OPERATION_ODDS = 0.37 # odds of x being of the form ax^b where a, b are in
 NICE_EXPO_ODDS = 0.7 # odds of exponential power being integer only
 NICE_LOG_ODDS = 0.75 # odds of logarithm being the natural log
 FRACTION_EXPR_ODDS = 0.8 # odds of generated expression being put through a fraction if difficulty isn't medium or hard
+
+async def solve_problem(problem: str) -> str:
+    api_key = os.environ["MISTRAL_API_KEY"]
+    model = "mistral-medium-latest"
+
+    client = Mistral(api_key=api_key)
+    res = await client.chat.complete_async(
+        model=model,
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a master of differentiation, your task is to differentiate a user-provided "
+                           "mathematical expression, which is typically given in LaTeX form. You do not to provide "
+                           "any intermediate steps, working out, just concern yourself with the final answer. The final "
+                           "answer should be in the form of 'The derivative is: <answer>. "
+            },
+            {
+                "role": "user",
+                "content": "What is the derivative of " + problem + " ?"
+            }
+        ]
+    )
+
+    solution = res.choices[0].message.content
+    return solution
 
 def latex_to_png(latex_str: str) -> str:
     """
@@ -279,4 +308,4 @@ def calc_gen_text(difficulty: str) -> str:
     return x.replace("^{}", "")
 
 if __name__ == "__main__":
-    calc_gen("medium")
+    calc_gen("hard")
